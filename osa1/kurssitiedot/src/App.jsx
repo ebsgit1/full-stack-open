@@ -1,4 +1,5 @@
 const Header = (props)  => {
+  console.log("testi")
   return (
     <div>
       <h1>{props.course.name}</h1>
