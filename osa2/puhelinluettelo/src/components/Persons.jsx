@@ -1,12 +1,24 @@
-const Persons = ({ persons }) => {
+const Persons = ({ persons, filter, deletePerson }) => {
+  const personsToShow = filter
+    ? persons.filter((person) =>
+        person.name.toLowerCase().includes(filter.toLowerCase())
+      )
+    : persons;
+
   return (
-    <div>
-      {persons.map((person) => (
-        <li key={person.id}>
-          {person.name} {person.number}
+    <ul>
+      {personsToShow.map((person) => (
+        <li key={person.name}>
+          {person.name}: {person.number}
+          <button
+            className="btn-delete"
+            onClick={() => deletePerson(person.id, person.name)}
+          >
+            Delete
+          </button>
         </li>
       ))}
-    </div>
+    </ul>
   );
 };
 
