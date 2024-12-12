@@ -8,7 +8,6 @@ const api = supertest(app)
 
 const blogs = [
   {
-    _id: '5a422a851b54a676234d17f7',
     title: 'React patterns',
     author: 'Michael Chan',
     url: 'https://reactpatterns.com/',
@@ -16,7 +15,6 @@ const blogs = [
     __v: 0
   },
   {
-    _id: '5a422aa71b54a676234d17f8',
     title: 'Go To Statement Considered Harmful',
     author: 'Edsger W. Dijkstra',
     url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
@@ -24,7 +22,6 @@ const blogs = [
     __v: 0
   },
   {
-    _id: '5a422b3a1b54a676234d17f9',
     title: 'Canonical string reduction',
     author: 'Edsger W. Dijkstra',
     url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
@@ -32,7 +29,6 @@ const blogs = [
     __v: 0
   },
   {
-    _id: '5a422b891b54a676234d17fa',
     title: 'First class tests',
     author: 'Robert C. Martin',
     url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
@@ -40,7 +36,6 @@ const blogs = [
     __v: 0
   },
   {
-    _id: '5a422ba71b54a676234d17fb',
     title: 'TDD harms architecture',
     author: 'Robert C. Martin',
     url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
@@ -48,7 +43,6 @@ const blogs = [
     __v: 0
   },
   {
-    _id: '5a422bc61b54a676234d17fc',
     title: 'Type wars',
     author: 'Robert C. Martin',
     url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
@@ -146,6 +140,54 @@ test('blog without title or url returns 400', async () => {
     .post('/api/blogs')
     .send(withoutUrl)
     .expect(400)
+})
+
+test('a blog can be deleted', async () => {
+  const blogsAtStart = await Blog.find({})
+  const blogToDelete = blogsAtStart[0]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete._id.toString()}`)
+    .expect(204)
+
+  const blogsAtEnd = await Blog.find({})
+
+  assert.strictEqual(
+    blogsAtEnd.length,
+    blogsAtStart.length - 1,
+    'Blog count should decrease by 1'
+  )
+
+  const titles = blogsAtEnd.map((blog) => blog.title)
+  assert.ok(!titles.includes(blogToDelete.title), 'title should not exist after deletig')
+})
+
+test('a blog can be updated', async () => {
+  const blogsAtStart = await Blog.find({})
+  const blogToUpdate = blogsAtStart[0]
+
+  const updatedData = { likes: blogToUpdate.likes + 10 }
+
+  const response = await api
+    .put(`/api/blogs/${blogToUpdate._id}`)
+    .send(updatedData)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  assert.strictEqual(
+    response.body.likes,
+    blogToUpdate.likes + 10,
+    'Updated likes need to match'
+  )
+
+  const blogsAtEnd = await Blog.find({})
+  const updatedBlog = blogsAtEnd.find((blog) => blog._id.toString() === blogToUpdate._id.toString())
+
+  assert.strictEqual(
+    updatedBlog.likes,
+    blogToUpdate.likes + 10,
+    'Database likes need to match'
+  )
 })
 
 

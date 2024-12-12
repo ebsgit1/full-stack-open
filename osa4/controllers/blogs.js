@@ -36,28 +36,38 @@ blogsRouter.post('/', async (request, response) => {
   response.status(201).json(savedBlog)
 })
 
+blogsRouter.delete('/:id', async (req, res) => {
+  try {
+    const result = await Blog.findByIdAndDelete(req.params.id)
 
-// blogsRouter.delete('/:id', (request, response, next) => {
-//   Blog.findByIdAndDelete(request.params.id)
-//     .then(() => {
-//       response.status(204).end()
-//     })
-//     .catch(error => next(error))
-// })
+    if (result) {
+      res.status(204).end()
+    } else {
+      res.status(404).json({ error: 'Blog not found' })
+    }
+  } catch (error) {
+    res.status(400).json({ error: 'Invalid ID format' })
+  }
+})
 
-// blogsRouter.put('/:id', (request, response, next) => {
-//   const body = request.body
+blogsRouter.put('/:id', async (request, response) => {
+  const { likes } = request.body
 
-//   const blog = {
-//     content: body.content,
-//     important: body.important,
-//   }
+  try {
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      request.params.id,
+      { likes },
+      { new: true, runValidators: true, context: 'query' }
+    )
 
-//   Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
-//     .then(updatedBlog => {
-//       response.json(updatedBlog)
-//     })
-//     .catch(error => next(error))
-// })
-
+    if (updatedBlog) {
+      response.json(updatedBlog)
+    } else {
+      response.status(404).json({ error: 'Blog not found' })
+    }
+  } catch (error) {
+    console.error('Error updating blog:', error.message)
+    response.status(400).json({ error: 'Invalid data or ID' })
+  }
+})
 module.exports = blogsRouter
