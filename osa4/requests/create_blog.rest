@@ -1,9 +1,11 @@
 POST http://localhost:3003/api/blogs
-content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOiI2NzVmZDU4ZTdhODIzZDlmYjcyZDdmYWQiLCJpYXQiOjE3MzQzMzQ5NTksImV4cCI6MTczNDMzODU1OX0.x8IvEuN--XO2mhI1c16T7-x1X9vO9h_hRl9AF0v3h5A
+Content-type: application/json
 
 {
-    "title": "test post 3",
-    "author": "String 3",
-    "url": "test3.fi",
-    "likes": 3
+    "title": "test post 4",
+    "author": "Author 4",
+    "url": "test4.fi",
+    "likes": 4,
+    "userId": "675fd58e7a823d9fb72d7fad"
 }
